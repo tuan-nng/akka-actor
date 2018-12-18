@@ -2,11 +2,9 @@ package com.lightbend.akka.sample;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import akka.actor.Props;
-import akka.routing.RoundRobinPool;
 
 public class AkkaQuickstart {
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         final ActorSystem system = ActorSystem.create("helloakka");
 
         //#create-actors
@@ -20,17 +18,18 @@ public class AkkaQuickstart {
                 system.actorOf(Greeter.props("Good day", printerActor), "goodDayGreeter");
         //#create-actors
 
+        howdyGreeter.tell(new Greeter.WhoToGreet("Akka"), ActorRef.noSender());
+        howdyGreeter.tell(new Greeter.Greet(), ActorRef.noSender());
 
-        ActorRef router = system.actorOf(new RoundRobinPool(4).props(Props.create(Worker.class)), "router");
-        ActorRef puller = system.actorOf(Props.create(Puller.class, new Source(), router));
-        long start = System.currentTimeMillis();
-        puller.tell(new Puller.Start(), ActorRef.noSender());
-        System.out.println(System.currentTimeMillis() - start);
+        howdyGreeter.tell(new Greeter.WhoToGreet("Lightbend"), ActorRef.noSender());
+        howdyGreeter.tell(new Greeter.Greet(), ActorRef.noSender());
 
-        Thread.sleep(1000);
-        puller.tell(new Puller.Stop(), ActorRef.noSender());
-        System.out.println(router.isTerminated());
-        System.out.println(puller.isTerminated());
+        helloGreeter.tell(new Greeter.WhoToGreet("Java"), ActorRef.noSender());
+        helloGreeter.tell(new Greeter.Greet(), ActorRef.noSender());
+
+        goodDayGreeter.tell(new Greeter.WhoToGreet("Play"), ActorRef.noSender());
+        goodDayGreeter.tell(new Greeter.Greet(), ActorRef.noSender());
+
         system.terminate();
     }
 }

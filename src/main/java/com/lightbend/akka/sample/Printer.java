@@ -9,7 +9,7 @@ import akka.event.LoggingAdapter;
 public class Printer extends AbstractActor {
     //#printer-messages
     static public Props props() {
-        return Props.create(Printer.class, () -> new Printer());
+        return Props.create(Printer.class, Printer::new);
     }
 
     //#printer-messages
